@@ -7,3 +7,6 @@
 Для развёртки инфраструктуры используем Terraform, а для установки ПО Ansible.
 
 ## Terraform
+Используем заранее написанный файл и активируем его через 
+terraform apply
+<img width="1280" height="776" alt="image" src="https://github.com/user-attachments/assets/4adb4825-0eb1-4b6b-8887-e18406f4200a" />
