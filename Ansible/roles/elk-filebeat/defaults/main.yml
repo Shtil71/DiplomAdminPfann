@@ -1,0 +1,9 @@
+# roles/elk-filebeat/defaults/main.yml
+---
+# куда отсылать логи nginx
+elasticsearch_host: "elasticsearch.ru-central1.internal"
+elasticsearch_port: 9200
+
+# куда Filebeat может подтягивать Kibana (для setup dashboards)
+kibana_host: "kibana.ru-central1.internal"
+kibana_port: 5601

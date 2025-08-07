@@ -1,0 +1,68 @@
+---
+# roles/elk-docker-elasticsearch/tasks/main.yml
+
+- name: Install dependencies for Docker and pip
+  apt:
+    name:
+      - apt-transport-https
+      - ca-certificates
+      - curl
+      - gnupg
+      - lsb-release
+      - python3-pip
+      - python3-docker
+    state: present
+    update_cache: yes
+
+- name: Add Docker GPG key
+  apt_key:
+    url: https://download.docker.com/linux/ubuntu/gpg
+    keyring: /usr/share/keyrings/docker-archive-keyring.gpg
+    state: present
+
+- name: Add Docker APT repository for Ubuntu jammy
+  apt_repository:
+    repo: >-
+      deb [arch=amd64 signed-by=/usr/share/keyrings/docker-archive-keyring.gpg]
+      https://download.docker.com/linux/ubuntu
+      jammy stable
+    filename: docker
+    state: present
+
+- name: Update APT cache
+  apt:
+    update_cache: yes
+
+- name: Install Docker CE
+  apt:
+    name: docker-ce
+    state: latest
+
+- name: Ensure Docker service is running
+  systemd:
+    name: docker
+    state: started
+    enabled: yes
+
+- name: Add ubuntu user to docker group
+  user:
+    name: ubuntu
+    groups: docker
+    append: yes
+
+- name: Remove existing Elasticsearch container if present
+  shell: |
+    docker rm -f elasticsearch || true
+  args:
+    executable: /bin/bash
+
+- name: Run Elasticsearch via Docker CLI
+  shell: |
+    docker run -d \
+      --name elasticsearch \
+      --network host \
+      -e "ELASTICSEARCH_CLUSTER_NAME=diploma-cluster" \
+      -e "ELASTICSEARCH_HTTP_PORT=9200" \
+      bitnami/elasticsearch:8.5.1
+  args:
+    executable: /bin/bash

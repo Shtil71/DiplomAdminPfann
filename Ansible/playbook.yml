@@ -1,0 +1,23 @@
+
+---
+- name: Configure web servers
+  hosts: webservers
+  become: yes
+  roles:
+    - nginx
+    - zabbix-agent
+
+- hosts: elasticsearch
+  become: true
+  roles:
+    - role: elk-docker-elasticsearch
+
+- hosts: kibana
+  become: true
+  roles:
+    - role: elk-docker-kibana
+
+- hosts: webservers
+  become: true
+  roles:
+    - role: elk-filebeat

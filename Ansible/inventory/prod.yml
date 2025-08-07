@@ -1,0 +1,55 @@
+all:
+  vars:
+    ansible_user: ubuntu
+    ansible_ssh_private_key_file: ~/.ssh/id_rsa
+
+    # Всё временные файлы Ansible на удалённых хостах будут в /tmp/ansible-remote
+    ansible_remote_tmp: /tmp/ansible-remote
+
+  children:
+
+    bastion:
+      hosts:
+        bastion.ru-central1.internal:
+          ansible_host: 51.250.71.224
+          ansible_ssh_common_args: >
+            -o StrictHostKeyChecking=no
+            -o UserKnownHostsFile=/dev/null
+
+    webservers:
+      hosts:
+        web1.ru-central1.internal: {}
+        web2.ru-central1.internal: {}
+      vars:
+        ansible_ssh_common_args: >
+          -o ProxyCommand="ssh -i ~/.ssh/id_rsa -W %h:%p ubuntu@51.250.71.224"
+          -o StrictHostKeyChecking=no
+          -o UserKnownHostsFile=/dev/null
+
+    monitoring:
+      hosts:
+        monitoring.ru-central1.internal: {}
+      vars:
+        ansible_ssh_common_args: >
+          -o ProxyCommand="ssh -i ~/.ssh/id_rsa -W %h:%p ubuntu@51.250.71.224"
+          -o StrictHostKeyChecking=no
+          -o UserKnownHostsFile=/dev/null
+
+    elasticsearch:
+      hosts:
+        elasticsearch.ru-central1.internal: {}
+      vars:
+        ansible_ssh_common_args: >
+          -o ProxyCommand="ssh -i ~/.ssh/id_rsa -W %h:%p ubuntu@51.250.71.224"
+          -o StrictHostKeyChecking=no
+          -o UserKnownHostsFile=/dev/null
+
+    kibana:
+      hosts:
+        kibana.ru-central1.internal: {}
+      vars:
+        ansible_ssh_common_args: >
+          -o ProxyCommand="ssh -i ~/.ssh/id_rsa -W %h:%p ubuntu@51.250.71.224"
+          -o StrictHostKeyChecking=no
+          -o UserKnownHostsFile=/dev/null
+
