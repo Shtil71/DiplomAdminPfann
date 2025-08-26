@@ -1,0 +1,42 @@
+---
+
+- name: Ensure Apache is stopped and disabled
+  service:
+    name: apache2
+    state: stopped
+    enabled: no
+  ignore_errors: yes
+
+- name: Install nginx
+  apt:
+    name: nginx
+    state: present
+    update_cache: yes
+
+- name: Ensure nginx is running and enabled
+  service:
+    name: nginx
+    state: started
+    enabled: yes
+
+- name: Deploy website content
+  copy:
+    src: ../../files/index.html
+    dest: /var/www/html/index.html
+    owner: root
+    group: root
+    mode: '0644'
+
+- name: Configure nginx
+  template:
+    src: ../../templates/nginx.conf.j2
+    dest: /etc/nginx/sites-available/default
+    owner: root
+    group: root
+    mode: '0644'
+  notify: restart nginx
+
+- name: restart nginx
+  service:
+    name: nginx
+    state: restarted
