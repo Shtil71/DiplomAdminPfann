@@ -1,0 +1,33 @@
+---
+# roles/elk-filebeat/tasks/main.yml
+
+- name: Copy Filebeat .deb to remote
+  copy:
+    src: filebeat-8.9.0-amd64.deb
+    dest: /tmp/
+
+- name: Install Filebeat from local .deb
+  apt:
+    deb: /tmp/filebeat-8.9.0-amd64.deb
+
+- name: Wait for Elasticsearch to be available
+  wait_for:
+    host: "{{ elasticsearch_host }}"
+    port: "{{ elasticsearch_port }}"
+    state: started
+    timeout: 300
+
+- name: Deploy Filebeat configuration
+  template:
+    src: filebeat.yml.j2
+    dest: /etc/filebeat/filebeat.yml
+  notify: restart filebeat
+
+- name: Setup Filebeat index template & ILM policy
+  shell: filebeat setup --index-management -E setup.ilm.overwrite=true
+
+- name: Enable and start Filebeat service
+  systemd:
+    name: filebeat
+    enabled: yes
+    state: started

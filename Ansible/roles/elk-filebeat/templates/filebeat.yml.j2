@@ -1,0 +1,15 @@
+# roles/elk-filebeat/templates/filebeat.yml.j2
+filebeat.inputs:
+- type: log
+  enabled: true
+  paths:
+    - /var/log/nginx/access.log
+    - /var/log/nginx/error.log
+
+output.elasticsearch:
+  # используем переменные elasticsearch_host и elasticsearch_port из defaults/main.yml
+  hosts: ["http://{{ elasticsearch_host }}:{{ elasticsearch_port }}"]
+
+setup.kibana:
+  # используем переменные kibana_host и kibana_port из defaults/main.yml
+  host: "http://{{ kibana_host }}:{{ kibana_port }}"
